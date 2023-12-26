@@ -77,10 +77,10 @@ The provided PowerShell script automates the process of changing licenses for Of
    - The Microsoft Graph module can be installed by running: `Install-Module Microsoft.Graph -Scope CurrentUser`.
    - To run the script, you must run the following command as administrator: `Set-ExecutionPolicy RemoteSigned`
 
-1. **CSV File Format**
+2. **CSV File Format**
    - The CSV file should contain a column with the header 'UPN' (User Principal Name), representing the user identities. The script uses this column to identify and modify user licenses.
 
-2. **User Authentication**
+3. **User Authentication**
    - When the Connect-MgGraph command is executed, the script prompts the user to log in to Microsoft Graph. The user needs to enter their credentials to establish the connection.
 
 #### Script Functions
