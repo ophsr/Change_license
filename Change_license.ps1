@@ -33,7 +33,7 @@ Function ConnectMgGraphModule {
 }
 
 function Choice {
-    $ValidInput = @('1', '2')
+    $ValidInput = @('1', '2', '3')
     $response = ''
     $filePath = ''
 
@@ -49,9 +49,9 @@ function Choice {
     }
     
     Write-Host "`r`nWhich license do you want to ADD and REMOVE in the list users ($filePath)"-ForegroundColor DarkYellow
-    Write-Host "## 1- ADD M365 E3 and REMOVE Office 365 E3`r`n## 2- ADD M365 F3 and REMOVE Office 365 F3`r`n" -ForegroundColor DarkYellow
+    Write-Host "## 1- ADD M365 E3 and REMOVE Office 365 E3`r`n## 2- ADD M365 F3 and REMOVE Office 365 F3`r`n## 3- ADD Office 365 E1 and REMOVE Office 365 E3`r`n" -ForegroundColor DarkYellow
     while ($response -eq '') {
-        $response = Read-Host -Prompt "    Enter option (1 or 2)"
+        $response = Read-Host -Prompt "    Enter option (1, 2 or 3)"
         if ($response -notin $ValidInput) {
             [console]::Beep(1000, 100)
             $response = ''
@@ -66,18 +66,23 @@ function Choice {
             Write-Log INFO "ADD M365 F3 and REMOVE Office 365 F3"
             ChangeLicense ChangeForM365_f3 $filePath
         }
+        3 {
+            Write-Log INFO "ADD Office 365 E1 and REMOVE Office 365 E3"
+            ChangeLicense ChangeForM365_E3_E1_TO $filePath
+        }
     }
 }
 
 function ChangeLicense {
     Param
     (
-        [Parameter(Mandatory = $true)][ValidateSet("ChangeForM365_e3", "ChangeForM365_f3")]
+        [Parameter(Mandatory = $true)][ValidateSet("ChangeForM365_e3", "ChangeForM365_f3", "ChangeForM365_E3_E1_TO")]
         [string]$Type,
         [Parameter(Mandatory = $true)][string]$FilePath
     )
     $Office_f3 = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'DESKLESSPACK'
     $Office_e3 = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'ENTERPRISEPACK'
+    $Office_e1 = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'STANDARDPACK'
     $Microsoft_f3 = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'SPE_F1'
     $Microsoft_e3 = Get-MgSubscribedSku -All | Where SkuPartNumber -eq 'SPE_E3'
     $UpnList = Import-Csv $FilePath ";"
@@ -122,7 +127,24 @@ function ChangeLicense {
                 Write-Log INFO "$upn - Add Microsoft F3 successfully" 
             }
         }
-        Start-Sleep -Milliseconds 500
+        if ($Type -eq "ChangeForM365_E3_E1_TO") {
+            # Unassign Office e3
+            Set-MgUserLicense -UserId $upn.UPN -AddLicenses @{} -RemoveLicenses @($Office_e3.SkuId) -ErrorVariable ConnectionError | Out-Null 
+            if ($ConnectionError -ne $null) {    
+                Write-Log ERROR "$upn -> $ConnectionError"
+            }
+            else {
+                Write-Log INFO "$upn - Remove Office E3 successfully"
+            }
+            #Assign M365 e1
+            Set-MgUserLicense -UserId $upn.UPN -AddLicenses @{SkuId = $Office_e1.SkuId }  -RemoveLicenses @() -ErrorVariable ConnectionError | Out-Null 
+            if ($ConnectionError -ne $null) {    
+                Write-Log ERROR "$upn -> $ConnectionError"
+            }
+            else {
+                Write-Log INFO "$upn - Add Office E1 successfully" 
+            }
+        }
     }
 }
 

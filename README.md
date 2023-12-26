@@ -9,6 +9,7 @@ O script PowerShell fornecido automatiza o processo de alteração de licenças 
 1. **Módulo PowerShell do Microsoft Graph:**
    - O script verifica a disponibilidade do módulo PowerShell do Microsoft Graph. Se ausente, solicita que o usuário o instale.
    - O módulo Microsoft Graph pode ser instalado com o comando: `Install-Module Microsoft.Graph -Scope CurrentUser`.
+   - Para executar o script é necessesário executar o seguinte comando como administrador: `Set-ExecutionPolicy RemoteSigned`
   
 2. **Formato do Arquivo CSV**
    - O arquivo CSV deve conter uma coluna com o cabeçalho 'UPN' (User Principal Name), representando as identidades dos usuários. O script utiliza esta coluna para identificar e modificar as licenças dos usuários.
@@ -27,6 +28,7 @@ O script PowerShell fornecido automatiza o processo de alteração de licenças 
 - Permite ao usuário escolher entre duas opções de modificação de licença:
   - Opção 1: ADICIONAR M365 E3 e REMOVER Office 365 E3
   - Opção 2: ADICIONAR M365 F3 e REMOVER Office 365 F3
+  - Opção 3: ADICIONAR Office 365 E1 e REMOVER Office 365 E3
 - Chama a função `ChangeLicense` com base na escolha do usuário.
 
 ##### Função `ChangeLicense`
@@ -73,11 +75,12 @@ The provided PowerShell script automates the process of changing licenses for Of
 1. **Microsoft Graph PowerShell Module:**
    - The script checks for the availability of the Microsoft Graph PowerShell module. If not present, it prompts the user to install it.
    - The Microsoft Graph module can be installed by running: `Install-Module Microsoft.Graph -Scope CurrentUser`.
+   - To run the script, you must run the following command as administrator: `Set-ExecutionPolicy RemoteSigned`
 
-2. **CSV File Format**
+1. **CSV File Format**
    - The CSV file should contain a column with the header 'UPN' (User Principal Name), representing the user identities. The script uses this column to identify and modify user licenses.
 
-3. **User Authentication**
+2. **User Authentication**
    - When the Connect-MgGraph command is executed, the script prompts the user to log in to Microsoft Graph. The user needs to enter their credentials to establish the connection.
 
 #### Script Functions
@@ -91,6 +94,7 @@ The provided PowerShell script automates the process of changing licenses for Of
 - Allows the user to choose between two license modification options:
   - Option 1: ADD M365 E3 and REMOVE Office 365 E3
   - Option 2: ADD M365 F3 and REMOVE Office 365 F3
+  - Option 3: ADD Office 365 E1 and REMOVE Office 365 E3
 - Calls the `ChangeLicense` function based on the user's choice.
 
 ##### `ChangeLicense` Function
